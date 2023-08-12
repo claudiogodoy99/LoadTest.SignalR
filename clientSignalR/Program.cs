@@ -7,6 +7,10 @@ public class Program
     {
         DisplayImage();
 
+#if DEBUG
+        Console.WriteLine("Press ENTER to start.");
+        Console.ReadLine();
+#endif
         var cancellationToken = new CancellationTokenSource();
 
         var init = new Initializer(args);
@@ -25,7 +29,6 @@ public class Program
 
         Console.WriteLine("Terminating...");
         await orchestrator.CloseAllConnection();
-        cancellationToken.Cancel();
 
         Console.WriteLine("Generating Results File...");
         var csvWriter = new CsvWriter(messageAnalytics, init);

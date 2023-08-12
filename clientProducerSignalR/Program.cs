@@ -6,9 +6,10 @@ public class Program
     {
         DisplayImage();
 
+#if DEBUG
         Console.WriteLine("Press ENTER to start.");
         Console.ReadLine();
-
+#endif
         var cancellationToken = new CancellationTokenSource();
 
         var init = new Initializer(args);
