@@ -1,5 +1,4 @@
 ﻿using clientSignalR;
-using Microsoft.AspNetCore.SignalR.Client;
 using sharedCore;
 
 public class Program
@@ -12,22 +11,21 @@ public class Program
 
         var init = new Initializer(args);
 
-        DateTime startTime = DateTime.Now;
-
-        var messageAnalytics = new MessageAnalyticsBase(cancellationToken.Token);
+        var messageAnalytics = new MessageAnalyticsBase(init.Clients, cancellationToken.Token);
         var orchestrator = new ConnectionOrchestrator(init, cancellationToken, messageAnalytics);
 
-        while (cancellationToken.IsCancellationRequested == false)
+        cancellationToken.CancelAfter(init.Duration);
+        try
         {
-            await Task.Delay(TimeSpan.FromSeconds(1));
-
-            if (DateTime.Now - startTime > init.Duration)
-            {
-                Console.WriteLine("Terminating...");
-                await orchestrator.CloseAllConnection();
-                cancellationToken.Cancel();
-            }
+            await orchestrator.StartAsync();
         }
+        catch (OperationCanceledException)
+        {
+        }
+
+        Console.WriteLine("Terminating...");
+        await orchestrator.CloseAllConnection();
+        cancellationToken.Cancel();
 
         Console.WriteLine("Generating Results File...");
         var csvWriter = new CsvWriter(messageAnalytics, init);

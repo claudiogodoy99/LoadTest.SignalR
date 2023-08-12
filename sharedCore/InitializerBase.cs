@@ -6,11 +6,12 @@ public class InitializerBase
     public int Clients { get; set; }
     public string WithUrl { get; set; }
 
-    public string Path {get;set;}
+    public string Path { get; set; }
 
-    public string Comments { get; set;}
+    public string Comments { get; set; }
 
-    public InitializerBase(string[] args) {
+    public InitializerBase(string[] args)
+    {
         var indexTime = Array.IndexOf(args, "--duration");
 
         if (indexTime == -1) Duration = TimeSpan.FromMilliseconds(double.MaxValue);

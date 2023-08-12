@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "clientProducerSignalR": {
+      "commandName": "Project",
+      "commandLineArgs": "--url http://localhost:5062/notificationhub --clients 4 --duration 100 --mps 250 --path .\\results\\ --reconnect --comment \"Teste de carga\""
+    }
+  }
+}

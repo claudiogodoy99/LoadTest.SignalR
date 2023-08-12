@@ -5,7 +5,7 @@ namespace clientProducerSignalR;
 public class Initializer : InitializerBase
 {
     public int Mps { get; set; }
-    public int StartingId {get;set;}
+    public int StartingId { get; set; }
 
     public Initializer(string[] args) : base(args)
     {
@@ -16,7 +16,7 @@ public class Initializer : InitializerBase
 
         var startingId = Array.IndexOf(args, "--startingDataId");
 
-        if(startingId == -1) StartingId = 0;
+        if (startingId == -1) StartingId = 0;
         else StartingId = int.Parse(args[startingId + 1]);
 
     }

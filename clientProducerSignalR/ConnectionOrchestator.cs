@@ -1,37 +1,30 @@
 
 namespace clientProducerSignalR;
-
-using System.Collections.Concurrent;
-using System.Threading;
 using Microsoft.AspNetCore.SignalR.Client;
 using sharedCore;
+using System.Threading;
 
-public class ConnectionOrchestrator : ConnectionOrchestratorBase
+public class ConnectionOrchestrator : ConnectionOrchestratorBase<Initializer>
 {
-    private new readonly Initializer _initializer;
-    public ConnectionOrchestrator(Initializer initializer, CancellationTokenSource cancellationToken, MessageAnalyticsBase messageAnalytics) : base(initializer, cancellationToken, messageAnalytics)
+    public ConnectionOrchestrator(Initializer initializer, CancellationTokenSource cancellationToken)
+        : base(initializer, "producer", cancellationToken)
     {
-        _initializer = initializer;
     }
 
-    public override void RegisterConnectionEvents(HubConnection connection)
+    public override Task RegisterConnectionEvents(int slot, HubConnection connection)
     {
-        Task.Run(async () =>
+        return Task.Run(async () =>
         {
-            while (true)
+            var bytes = new char[1000];
+            bytes.AsSpan().Fill(' ');
+            while (!_cancellationToken.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
-                List<Task> analytics = new();
-
-                var bytes = new byte[1000];
-
                 for (int i = 0; i <= _initializer.Mps; i++)
                 {
-                    await connection.InvokeAsync("SendNotificationToGroup", $"XPTO|{i}", bytes);
-                    analytics.Add(_messageAnalytics.RegisterMessage(DateTime.Now));
+                    DateTime.UtcNow.Ticks.TryFormat(bytes, out _);
+                    await connection.SendAsync("SendNotificationToGroup", $"XPTO|{i}", new string(bytes), _cancellationToken.Token);
                 }
-
-                await Task.WhenAll(analytics);
             }
         }, cancellationToken: _cancellationToken.Token);
     }

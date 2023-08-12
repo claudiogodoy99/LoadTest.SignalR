@@ -2,24 +2,21 @@ namespace sharedCore;
 
 public class MessageAnalyticsBase
 {
+    public DateTime _first;
+    public DateTime _last;
+    private readonly int[] _offsetMessages;
+    public readonly List<(DateTime Sent, DateTime Received)>[] _messagesTimeSlots;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1);
-    private int _messages = 0;
-    public List<DateTime> _messagesTime = new();
-
-    public double GetTotalMessages()
+    public MessageAnalyticsBase(int clients, CancellationToken token)
     {
-        _semaphoreSlim.Wait();
-        int totalMessage = _messages;
-        _semaphoreSlim.Release();
+        _messagesTimeSlots = new List<(DateTime Sent, DateTime Received)>[clients];
+        _offsetMessages = new int[clients];
+        for (int i = 0; i < _messagesTimeSlots.Length; i++)
+            _messagesTimeSlots[i] = new List<(DateTime Sent, DateTime Received)>(1 << 20);
 
-        return totalMessage;
-    }
-
-    public MessageAnalyticsBase(CancellationToken token)
-    {
         Task.Run(async () =>
         {
+            _first = _last = DateTime.UtcNow;
             while (true)
             {
                 await Task.Delay(TimeSpan.FromSeconds(10));
@@ -30,12 +27,12 @@ public class MessageAnalyticsBase
 
     private async Task LogAnalytics()
     {
-        double messagesPerSecond = await GetMessagesPerSecond();
-
+        (double messagesPerSecond, int count, TimeSpan avgLatency) = GetWindowStatistics();
         Console.WriteLine("Analytics:");
-        Console.WriteLine($"- Total messages: {_messages}");
+        Console.WriteLine($"- Total messages: {count}");
         Console.WriteLine($"- Messages per second: {messagesPerSecond}");
-         Console.WriteLine($"---------------------------------------------");
+        Console.WriteLine($"- Average latency: {avgLatency}");
+        Console.WriteLine($"---------------------------------------------");
         Console.WriteLine($"- Threads in use: {ThreadPool.ThreadCount}");
         Console.WriteLine($"- PendingWorkItemCount: {ThreadPool.PendingWorkItemCount}");
         Console.WriteLine($"---------------------------------------------");
@@ -43,40 +40,65 @@ public class MessageAnalyticsBase
     }
 
 
-    public async Task RegisterMessage(DateTime time)
+    public void RegisterMessage(int slot, DateTime sent, DateTime received)
     {
-        await _semaphoreSlim.WaitAsync();
-        _messages++;
-        _messagesTime.Add(time);
-        _semaphoreSlim.Release();
+        var messagesTime = _messagesTimeSlots[slot];
+        lock (messagesTime)
+            messagesTime.Add((sent, received));
     }
 
-    public async Task<double> GetMessagesPerSecond()
+    public (double MessagesPerSecond, int Count, TimeSpan AvgLatency) GetWindowStatistics()
     {
-        double messagesPerSecond = 0;
-        await _semaphoreSlim.WaitAsync();
+        int count = 0;
+        TimeSpan sumLatency = TimeSpan.Zero;
 
-        if (_messagesTime.Count > 1)
+        for (int i = 0; i < _offsetMessages.Length; i++)
         {
-            TimeSpan timeSpan = _messagesTime.Max() - _messagesTime.Min();
-            messagesPerSecond = _messages / timeSpan.TotalSeconds;
-        }
+            var stats = GetStatistics(_messagesTimeSlots[i], ref _offsetMessages[i]);
 
-        _semaphoreSlim.Release();
-        return messagesPerSecond;
+            count += stats.Count;
+            sumLatency += stats.SumLatency;
+        }
+        var result = (count / (DateTime.UtcNow - _last).TotalSeconds, count, sumLatency / count);
+        _last = DateTime.UtcNow;
+        return result;
     }
 
-    public double CalculateMediaInterval()
+    private (int Count, TimeSpan SumLatency) GetStatistics(List<(DateTime Sent, DateTime Received)> messagesTime, ref int offset)
     {
-        TimeSpan totalInterval = TimeSpan.Zero;
-        for (int i = 1; i < _messagesTime.Count; i++)
+        int count = 0;
+        TimeSpan averageLatency = TimeSpan.Zero;
+        lock (messagesTime)
         {
-            totalInterval += _messagesTime[i] - _messagesTime[i - 1];
+            count = messagesTime.Count - offset;
+            if (count > 1)
+            {
+                TimeSpan latency = TimeSpan.Zero;
+                for (int i = 0; i < count; i++)
+                {
+                    var message = messagesTime[offset + i];
+                    latency += message.Received - message.Sent;
+                }
+                averageLatency = latency / count;
+                offset = messagesTime.Count;
+            }
         }
-
-        TimeSpan averageInterval = TimeSpan.FromTicks(totalInterval.Ticks / (_messagesTime.Count - 1));
-
-        return averageInterval.TotalMilliseconds;
+        return (count, averageLatency);
     }
 
+    public (double MessagesPerSecond, int Count, TimeSpan AvgLatency) GetTotalStatistics()
+    {
+        int count = 0;
+        TimeSpan sumLatency = TimeSpan.Zero;
+
+        for (int i = 0; i < _offsetMessages.Length; i++)
+        {
+            int offset = 0;
+            var stats = GetStatistics(_messagesTimeSlots[i], ref offset);
+
+            count += stats.Count;
+            sumLatency += stats.SumLatency;
+        }
+        return (count / (_first - _last).TotalSeconds, count, sumLatency / count);
+    }
 }
