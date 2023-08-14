@@ -2,7 +2,7 @@
   "profiles": {
     "clientSignalR": {
       "commandName": "Project",
-      "commandLineArgs": "--url http://localhost:5062/notificationhub --clients 250 --duration 100 --path .\\results --comment Teste de carga"
+      "commandLineArgs": "\"http://localhost:5062/notificationhub\" \".\\results\" --clients 250 --duration 100 --comment \"Teste de carga\""
     }
   }
 }
