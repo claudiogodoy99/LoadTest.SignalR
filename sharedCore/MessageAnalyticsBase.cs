@@ -2,24 +2,19 @@ namespace sharedCore;
 
 public class MessageAnalyticsBase
 {
+    public DateTime _first;
+    public DateTime _last;
+    public int count;
+    public long ticks;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1);
-    private int _messages = 0;
-    public List<DateTime> _messagesTime = new();
-
-    public double GetTotalMessages()
-    {
-        _semaphoreSlim.Wait();
-        int totalMessage = _messages;
-        _semaphoreSlim.Release();
-
-        return totalMessage;
-    }
+    public int totalCount;
+    public long totalTicks;
 
     public MessageAnalyticsBase(CancellationToken token)
     {
         Task.Run(async () =>
         {
+            _first = _last = DateTime.UtcNow;
             while (true)
             {
                 await Task.Delay(TimeSpan.FromSeconds(10));
@@ -30,12 +25,12 @@ public class MessageAnalyticsBase
 
     private async Task LogAnalytics()
     {
-        double messagesPerSecond = await GetMessagesPerSecond();
-
+        (double messagesPerSecond, int count, TimeSpan avgLatency) = GetWindowStatistics();
         Console.WriteLine("Analytics:");
-        Console.WriteLine($"- Total messages: {_messages}");
+        Console.WriteLine($"- Total messages: {count}");
         Console.WriteLine($"- Messages per second: {messagesPerSecond}");
-         Console.WriteLine($"---------------------------------------------");
+        Console.WriteLine($"- Average latency: {avgLatency}");
+        Console.WriteLine($"---------------------------------------------");
         Console.WriteLine($"- Threads in use: {ThreadPool.ThreadCount}");
         Console.WriteLine($"- PendingWorkItemCount: {ThreadPool.PendingWorkItemCount}");
         Console.WriteLine($"---------------------------------------------");
@@ -43,40 +38,28 @@ public class MessageAnalyticsBase
     }
 
 
-    public async Task RegisterMessage(DateTime time)
+    public void RegisterMessage(DateTime sent, DateTime received)
     {
-        await _semaphoreSlim.WaitAsync();
-        _messages++;
-        _messagesTime.Add(time);
-        _semaphoreSlim.Release();
+        Interlocked.Add(ref ticks, (received - sent).Ticks);
+        Interlocked.Increment(ref count);
     }
 
-    public async Task<double> GetMessagesPerSecond()
+    public (double MessagesPerSecond, int Count, TimeSpan AvgLatency) GetWindowStatistics()
     {
-        double messagesPerSecond = 0;
-        await _semaphoreSlim.WaitAsync();
+        var localTicks = Interlocked.Exchange(ref ticks, 0);
+        var localCount = Interlocked.Exchange(ref count, 0);
+        var elapsedSecondsFromLast = (DateTime.UtcNow - _last).TotalSeconds;
 
-        if (_messagesTime.Count > 1)
-        {
-            TimeSpan timeSpan = _messagesTime.Max() - _messagesTime.Min();
-            messagesPerSecond = _messages / timeSpan.TotalSeconds;
-        }
-
-        _semaphoreSlim.Release();
-        return messagesPerSecond;
+        var result = (localCount / elapsedSecondsFromLast, localCount, TimeSpan.FromTicks(localTicks / localCount));
+        Interlocked.Add(ref totalTicks, localTicks);
+        Interlocked.Add(ref totalCount, localCount);
+ 
+        _last = DateTime.UtcNow;
+        return result;
     }
 
-    public double CalculateMediaInterval()
+    public (double MessagesPerSecond, int Count, TimeSpan AvgLatency) GetTotalStatistics()
     {
-        TimeSpan totalInterval = TimeSpan.Zero;
-        for (int i = 1; i < _messagesTime.Count; i++)
-        {
-            totalInterval += _messagesTime[i] - _messagesTime[i - 1];
-        }
-
-        TimeSpan averageInterval = TimeSpan.FromTicks(totalInterval.Ticks / (_messagesTime.Count - 1));
-
-        return averageInterval.TotalMilliseconds;
+        return (totalCount / (_last - _first).TotalSeconds, totalCount, TimeSpan.FromTicks(totalTicks / totalCount));
     }
-
 }

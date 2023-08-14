@@ -32,11 +32,11 @@ dotnet run -c Release
 
 Este componente é o responsável por simular os clientes que recebem as mensagens enviadas pelo servidor. A aplicação é um console, onde podemos passar os parâmetros:
 
-- `--url` - URL do servidor SignalR
+- URL do servidor SignalR (obrigatório)
+- Caminho onde será salvo o arquivo de resultado (obrigatório)
 - `--clients` - Quantidade de clientes que serão simulados
 - `--duration` - Duração do teste em segundos
-- `--path` - Caminho onde será salvo o arquivo de resultado
-- `--reconnect` - Parâmetro não obrigatório, quando passado, força a aplicação a recriar os clients a cada 10 segundos
+- `--reconnect` - Se habilitado força a reconexao de clients a cada 10 segundos
 - `--comment` - Comentário que será adicionado ao arquivo de resultado
 
 Exemplo de execução:
@@ -47,7 +47,7 @@ cd clientSignalR
 
 dotnet restore 
 
-dotnet run -c Release dotnet run --url http://localhost:5062/notificationhub --clients 500 --duration 100 --path C:\repos\loadtest-signalr\results\ --reconnect --comment "Teste de carga"
+dotnet run -c Release "http://localhost:5062/notificationhub" "C:\repos\loadtest-signalr\results\" --clients 500 --duration 100 --reconnect true --comment "Teste de carga"
 
 ```
 
@@ -55,11 +55,12 @@ dotnet run -c Release dotnet run --url http://localhost:5062/notificationhub --c
 
 Este componente é o responsável por simular os clientes que enviam as mensagens para o servidor. A aplicação é um console, onde podemos passar os parâmetros:
 
-- `--url` - URL do servidor SignalR
+- URL do servidor SignalR (obrigatório)
 - `--clients` - Quantidade de clientes que serão simulados
 - `--duration` - Duração do teste em segundos
-- `--path` - Caminho onde será salvo o arquivo de resultado
 - `--mps` - Numero de mensagens por segundo, de cada cliente
+- `--consumerClients` - Quantidade de clientes do lado do consumidor
+- `--messageSize` - Tamanho da mensagem a ser enviada
 - `--comment` - Comentário que será adicionado ao arquivo de resultado
 
 Exemplo de execução:
@@ -70,13 +71,13 @@ cd clientProducerSignalR
 
 dotnet restore
 
-dotnet run -c Release --url http://localhost:5062/notificationhub --clients 500 --duration 100 --path C:\repos\loadtest-signalr\results --mps 300 --comment Teste de carga
+dotnet run -c Release "http://localhost:5062/notificationhub" --clients 500 --duration 100 --mps 300 --messageSize 1024 --comment "Teste de carga"
 
 ```
 
 ## Resultados
 
-Os resultados dos testes serão salvos em arquivos `txt` no caminho especificado no parâmetro `--path` de cada aplicação. Cada linha representa um resultado de um teste, e cada coluna representa um atributo do resultado. Os atributos são:
+Os resultados dos testes serão salvos em arquivos `txt` no caminho especificado no parâmetro `--path` do consumidor. Cada linha representa um resultado de um teste, e cada coluna representa um atributo do resultado. Os atributos são:
 
 - `Date` - Data e hora do teste
 - `Clients` - Quantidade de clientes simulados
@@ -85,5 +86,5 @@ Os resultados dos testes serão salvos em arquivos `txt` no caminho especificado
 - `MessagesPerSecond` - Quantidade de mensagens enviadas por segundo
 - `TotalMessages` - Quantidade de mensagens recebidas
 - `Comment` - Comentário do teste
-- `MediaIntervalBetweenMessages` - Média do intervalo entre as mensagens
+- `AverageLatency` - Media de latencia entre envio e recebimento da mensagem
 - `Reconnect` - Indica se o teste foi realizado com reconexão dos clientes

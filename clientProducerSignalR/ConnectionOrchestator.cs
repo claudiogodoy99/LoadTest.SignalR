@@ -1,37 +1,42 @@
 
 namespace clientProducerSignalR;
-
-using System.Collections.Concurrent;
-using System.Threading;
 using Microsoft.AspNetCore.SignalR.Client;
 using sharedCore;
+using System.Diagnostics;
+using System.Threading;
 
-public class ConnectionOrchestrator : ConnectionOrchestratorBase
+public class ConnectionOrchestrator : ConnectionOrchestratorBase<Initializer>
 {
-    private new readonly Initializer _initializer;
-    public ConnectionOrchestrator(Initializer initializer, CancellationTokenSource cancellationToken, MessageAnalyticsBase messageAnalytics) : base(initializer, cancellationToken, messageAnalytics)
+    private readonly int messageSize;
+    private readonly int consumerClients;
+    private readonly int mps;
+
+    public ConnectionOrchestrator(Initializer initializer, CancellationTokenSource cancellationToken)
+        : base(initializer, "producer", cancellationToken)
     {
-        _initializer = initializer;
+        messageSize = initializer.MessageSize;
+        consumerClients = initializer.ConsumerClients;
+        mps = initializer.Mps / initializer.Clients;
     }
 
-    public override void RegisterConnectionEvents(HubConnection connection)
+    public override Task RegisterConnectionEvents(int slot, HubConnection connection)
     {
-        Task.Run(async () =>
+        return Task.Run(async () =>
         {
-            while (true)
+            var bytes = new char[messageSize];
+            bytes.AsSpan().Fill(' ');
+            TimeSpan oneSecond = TimeSpan.FromSeconds(1);
+            while (!_cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
-                List<Task> analytics = new();
-
-                var bytes = new byte[1000];
-
-                for (int i = 0; i <= _initializer.Mps; i++)
+                var timestamp = Stopwatch.GetTimestamp();
+                for (int i = 0; i <= mps; i++)
                 {
-                    await connection.InvokeAsync("SendNotificationToGroup", $"XPTO|{i}", bytes);
-                    analytics.Add(_messageAnalytics.RegisterMessage(DateTime.Now));
+                    DateTime.UtcNow.Ticks.TryFormat(bytes, out _);
+                    await connection.SendAsync("SendNotificationToGroup", $"XPTO|{i % consumerClients}", new string(bytes), _cancellationToken.Token);
                 }
-
-                await Task.WhenAll(analytics);
+                TimeSpan interval = Stopwatch.GetElapsedTime(timestamp);
+                if (interval <= oneSecond)
+                    await Task.Delay(oneSecond - interval, _cancellationToken.Token);
             }
         }, cancellationToken: _cancellationToken.Token);
     }
