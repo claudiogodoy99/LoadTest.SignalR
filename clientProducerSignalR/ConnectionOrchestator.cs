@@ -13,6 +13,7 @@ public class ConnectionOrchestrator : ConnectionOrchestratorBase<Initializer>
         : base(initializer, "producer", cancellationToken)
     {
         messageSize = initializer.MessageSize;
+        delay = initializer.Delay;
     }
 
     public override Task RegisterConnectionEvents(int slot, HubConnection connection)
