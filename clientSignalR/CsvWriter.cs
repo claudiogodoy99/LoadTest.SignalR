@@ -20,7 +20,7 @@ public class CsvWriter
         using StreamWriter outputFile = new(Path.Combine(_initializer.Path, "ResultsConsumer.txt"), append: true);
 
         if (outputFile.BaseStream.Length == 0)
-            await outputFile.WriteLineAsync("Date ;Clients Count; TotalMessages ; MessagePerSecond ; MediaIntervalBetweenMessages ; Duration ; Reconnect ; Comments");
+            await outputFile.WriteLineAsync("Date ;Clients Count; TotalMessages ; MessagePerSecond ; AverageLatency ; Duration ; Reconnect ; Comments");
 
         var stats = _messageAnalytics.GetTotalStatistics();
         await outputFile.WriteLineAsync($"{DateTime.Now.ToString("dd:MM:yyyy hh:mm:ss")} ;{_initializer.Clients} ; {stats.Count} ; {stats.MessagesPerSecond} ; {stats.AvgLatency} ; {_initializer.Duration} ; {_initializer.Reconnect} ; {_initializer.Comments} ");

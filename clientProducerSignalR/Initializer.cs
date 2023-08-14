@@ -24,12 +24,12 @@ public class Initializer : InitializerBase
         var messageSize = Array.IndexOf(args, "--messageSize");
 
         if (messageSize == -1) MessageSize = 1000;
-        else MessageSize = int.Parse(args[MessageSize + 1]);
+        else MessageSize = int.Parse(args[messageSize + 1]);
 
         var delay = Array.IndexOf(args, "--delay");
 
         if (delay == -1) Delay = 1000;
-        else Delay = int.Parse(args[Delay + 1]);
+        else Delay = int.Parse(args[delay + 1]);
 
     }
 
