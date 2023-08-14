@@ -60,6 +60,6 @@ public class MessageAnalyticsBase
 
     public (double MessagesPerSecond, int Count, TimeSpan AvgLatency) GetTotalStatistics()
     {
-        return (totalCount / (_first - _last).TotalSeconds, totalCount, TimeSpan.FromTicks(totalTicks / totalCount));
+        return (totalCount / (_last - _first).TotalSeconds, totalCount, TimeSpan.FromTicks(totalTicks / totalCount));
     }
 }
