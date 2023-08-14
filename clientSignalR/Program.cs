@@ -15,7 +15,7 @@ public class Program
 
         var init = new Initializer(args);
 
-        var messageAnalytics = new MessageAnalyticsBase(init.Clients, cancellationToken.Token);
+        var messageAnalytics = new MessageAnalyticsBase(cancellationToken.Token);
         var orchestrator = new ConnectionOrchestrator(init, cancellationToken, messageAnalytics);
 
         cancellationToken.CancelAfter(init.Duration);

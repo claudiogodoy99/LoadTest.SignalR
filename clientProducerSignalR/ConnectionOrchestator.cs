@@ -6,20 +6,24 @@ using System.Threading;
 
 public class ConnectionOrchestrator : ConnectionOrchestratorBase<Initializer>
 {
+    private readonly int messageSize;
+    private readonly int delay;
+
     public ConnectionOrchestrator(Initializer initializer, CancellationTokenSource cancellationToken)
         : base(initializer, "producer", cancellationToken)
     {
+        messageSize = initializer.MessageSize;
     }
 
     public override Task RegisterConnectionEvents(int slot, HubConnection connection)
     {
         return Task.Run(async () =>
         {
-            var bytes = new char[1000];
+            var bytes = new char[messageSize];
             bytes.AsSpan().Fill(' ');
             while (!_cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(delay));
                 for (int i = 0; i <= _initializer.Mps; i++)
                 {
                     DateTime.UtcNow.Ticks.TryFormat(bytes, out _);

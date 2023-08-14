@@ -60,6 +60,8 @@ Este componente é o responsável por simular os clientes que enviam as mensagen
 - `--duration` - Duração do teste em segundos
 - `--path` - Caminho onde será salvo o arquivo de resultado
 - `--mps` - Numero de mensagens por segundo, de cada cliente
+- `--messageSize` - Tamanho da mensagem a ser enviada
+- `--delay` - Pausa entre lotes de mensagens (em milissegundos)
 - `--comment` - Comentário que será adicionado ao arquivo de resultado
 
 Exemplo de execução:

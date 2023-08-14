@@ -26,7 +26,7 @@ public class ConnectionOrchestrator : MonitoredConnectionOrchestratorBase<Initia
             long.TryParse(s.Slice(0, s.IndexOf(' ')), out long ticks);
             var sent = new DateTime(ticks);
             var received = DateTime.UtcNow;
-            _messageAnalytics.RegisterMessage(slot, sent, received);
+            _messageAnalytics.RegisterMessage(sent, received);
         });
         TaskCompletionSource source = new TaskCompletionSource();
         cancellationToken.Register(() =>
