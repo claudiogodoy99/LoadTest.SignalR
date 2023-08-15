@@ -18,12 +18,12 @@ public class MessageAnalyticsBase
             while (true)
             {
                 await Task.Delay(TimeSpan.FromSeconds(10));
-                await LogAnalytics();
+                LogAnalytics();
             }
         }, token);
     }
 
-    private async Task LogAnalytics()
+    private void LogAnalytics()
     {
         (double messagesPerSecond, int count, TimeSpan avgLatency) = GetWindowStatistics();
         Console.WriteLine("Analytics:");

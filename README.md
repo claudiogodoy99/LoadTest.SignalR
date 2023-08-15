@@ -47,7 +47,7 @@ cd clientSignalR
 
 dotnet restore 
 
-dotnet run -c Release "http://localhost:5062/notificationhub" "C:\repos\loadtest-signalr\results\" --clients 500 --duration 100 --reconnect true --comment "Teste de carga"
+dotnet run -c Release --url http://localhost:5062/notificationhub --path C:\repos\loadtest-signalr\results\ --clients 500 --duration 100 --reconnect true --comment "Teste de carga"
 
 ```
 
@@ -71,7 +71,7 @@ cd clientProducerSignalR
 
 dotnet restore
 
-dotnet run -c Release "http://localhost:5062/notificationhub" --clients 500 --duration 100 --mps 300 --messageSize 1024 --comment "Teste de carga"
+dotnet run --url http://localhost:5062/notificationhub --clients 500 --consumerClients 500 --duration 100 --mps 50000 --messageSize 1024 --comment "Teste de carga"
 
 ```
 

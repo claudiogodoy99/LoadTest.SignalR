@@ -6,69 +6,15 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        var rootCommand = new RootCommand("Lado producer do teste de carga do SignalR");
-        var urlArgument = new Argument<string>(
-            "url",
-            "URL do servidor SignalR");
-
-        var durationOption = new Option<int>(
-            "--duration",
-            () => int.MaxValue,
-            "Duração do teste em segundos");
-        var clientsOption = new Option<int>(
-            "--clients",
-            () => 1,
-            "Quantidade de clientes que serão simulados");
-        var mpsOption = new Option<int>(
-            "--mps",
-            () => 100,
-            "Numero de mensagens por segundo, de cada cliente");
-        var consumerClientsOption = new Option<int>(
-            "--consumerClients",
-            () => 100,
-            "Quantidade de clientes do lado consumidor.");
-        var messageSizeOption = new Option<int>(
-            "--messageSize",
-            () => 1024,
-            "Tamanho da mensagem a ser enviada");
-        var commentOption = new Option<string>(
-            "--comment",
-            () => "",
-            "Comentário que será adicionado ao arquivo de resultado");
-
-        rootCommand.Add(urlArgument);
-        rootCommand.Add(durationOption);
-        rootCommand.Add(clientsOption);
-        rootCommand.Add(mpsOption);
-        rootCommand.Add(consumerClientsOption);
-        rootCommand.Add(messageSizeOption);
-        rootCommand.Add(commentOption);
-
-        rootCommand.SetHandler(RunAsync,
-            urlArgument, durationOption, clientsOption, mpsOption, consumerClientsOption, messageSizeOption, commentOption
-        );
-
-        await rootCommand.InvokeAsync(args);
-    }
-
-    private static async Task RunAsync(string url, int duration, int clients, int mps, int consumerClients, int messageSize, string comments)
-    {
         var cancellationToken = new CancellationTokenSource();
 
-        var init = new Initializer
-        {
-            WithUrl= url,
-            Duration = TimeSpan.FromSeconds(duration),
-            Clients = clients,
-            Mps = mps,
-            ConsumerClients = consumerClients,
-            MessageSize = messageSize,
-            Comments = comments
-        };
+        var init = new Initializer(args);
+
         var orchestrator = new ConnectionOrchestrator(init, cancellationToken);
         DisplayImage(init);
 
         cancellationToken.CancelAfter(init.Duration);
+        
         try
         {
             await orchestrator.StartAsync();
@@ -79,6 +25,7 @@ public class Program
         Console.WriteLine("Terminating...");
         await orchestrator.CloseAllConnection();
     }
+
 
     //Function that will display a console that represent a rocket
     public static void DisplayImage(Initializer init)

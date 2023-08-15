@@ -8,6 +8,4 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = clientProducerSignalR
-build_property.ProjectDir = C:\Users\pedrotravi\source\repos\LoadTest.SignalR\clientProducerSignalR\
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.ProjectDir = C:\repos\LoadTest.SignalR\clientProducerSignalR\

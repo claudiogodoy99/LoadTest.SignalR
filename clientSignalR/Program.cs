@@ -1,64 +1,16 @@
 ﻿using clientSignalR;
 using sharedCore;
-using System.CommandLine;
 using System.Text.Json;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
-        var rootCommand = new RootCommand("Lado consumer do teste de carga do SignalR");
-        var urlArgument = new Argument<string>(
-            "url",
-            "URL do servidor SignalR");
-        var pathArgument = new Argument<string>(
-            "path",
-            "Caminho onde será salvo o arquivo de resultado");
-
-        var reconnectOption = new Option<bool>(
-            "--reconnect",
-            () => false,
-            "Caso habilitado força a aplicação a recriar os clients a cada 10 segundos");
-        var durationOption = new Option<int>(
-            "--duration",
-            () => int.MaxValue,
-            "Duração do teste em segundos");
-        var clientsOption = new Option<int>(
-            "--clients",
-            () => 1,
-            "Quantidade de clientes que serão simulados");
-        var commentOption = new Option<string>(
-            "--comment",
-            () => "",
-            "Comentário que será adicionado ao arquivo de resultado");
-
-        rootCommand.Add(urlArgument);
-        rootCommand.Add(pathArgument);
-        rootCommand.Add(reconnectOption);
-        rootCommand.Add(durationOption);
-        rootCommand.Add(clientsOption);
-        rootCommand.Add(commentOption);
-
-        rootCommand.SetHandler(RunAsync,
-            urlArgument, pathArgument, reconnectOption, durationOption, clientsOption, commentOption
-        );
-
-        await rootCommand.InvokeAsync(args);
-    }
-    private static async Task RunAsync(string url, string path, bool reconnect, int duration, int clients, string comments)
-    {
         var cancellationToken = new CancellationTokenSource();
         var messageAnalytics = new MessageAnalyticsBase(cancellationToken.Token);
 
-        var init = new Initializer
-        {
-            Reconnect = reconnect,
-            Duration = TimeSpan.FromSeconds(duration),
-            Clients = clients,
-            Comments = comments,
-            WithUrl = url,
-            Path = path
-        };
+        var init = new Initializer(args);
+
         var orchestrator = new ConnectionOrchestrator(init, cancellationToken, messageAnalytics);
 
         DisplayImage(init);
