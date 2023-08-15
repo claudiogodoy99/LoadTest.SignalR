@@ -82,7 +82,6 @@ Os resultados dos testes serão salvos em arquivos `txt` no caminho especificado
 - `Date` - Data e hora do teste
 - `Clients` - Quantidade de clientes simulados
 - `Duration` - Duração do teste em segundos
-- `Messages` - Quantidade de mensagens enviadas
 - `MessagesPerSecond` - Quantidade de mensagens enviadas por segundo
 - `TotalMessages` - Quantidade de mensagens recebidas
 - `Comment` - Comentário do teste
