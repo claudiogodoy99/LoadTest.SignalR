@@ -1,7 +1,7 @@
-﻿using clientProducerSignalR;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.Text.Json;
 
+namespace clientProducerSignalR;
 public class Program
 {
     public static async Task Main(string[] args)
@@ -53,25 +53,16 @@ public class Program
 
     private static async Task RunAsync(string url, int duration, int clients, int mps, int consumerClients, int messageSize, string comments)
     {
-        var cancellationToken = new CancellationTokenSource();
+        var cancellationTokenSource = new CancellationTokenSource();
 
-        var init = new Initializer
-        {
-            WithUrl= url,
-            Duration = TimeSpan.FromSeconds(duration),
-            Clients = clients,
-            Mps = mps,
-            ConsumerClients = consumerClients,
-            MessageSize = messageSize,
-            Comments = comments
-        };
-        var orchestrator = new ConnectionOrchestrator(init, cancellationToken);
+        var init = new Initializer(TimeSpan.FromSeconds(duration), clients, url, comments, mps, messageSize, consumerClients);
+        var orchestrator = new ConnectionOrchestrator(init);
         DisplayImage(init);
 
-        cancellationToken.CancelAfter(init.Duration);
+        cancellationTokenSource.CancelAfter(init.Duration);
         try
         {
-            await orchestrator.StartAsync();
+            await orchestrator.RunAsync(cancellationTokenSource.Token);
         }
         catch (OperationCanceledException)
         { }

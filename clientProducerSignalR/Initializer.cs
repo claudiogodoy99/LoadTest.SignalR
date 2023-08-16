@@ -2,10 +2,18 @@ using sharedCore;
 
 namespace clientProducerSignalR;
 
-public class Initializer : InitializerBase
+public sealed class Initializer : InitializerBase
 {
-    public int Mps { get; init; }
-    public int MessageSize { get; init; }
-    public int ConsumerClients { get; init; }
+    public Initializer(TimeSpan duration, int clients, string withUrl, string comments, int mps, int messageSize, int consumerClients) 
+        : base(duration, clients, withUrl, comments)
+    {
+        Mps = mps;
+        MessageSize = messageSize;
+        ConsumerClients = consumerClients;
+    }
+
+    public int Mps { get; }
+    public int MessageSize { get; }
+    public int ConsumerClients { get; }
 }
 

@@ -1,8 +1,8 @@
-﻿using clientSignalR;
-using sharedCore;
+﻿using sharedCore;
 using System.CommandLine;
 using System.Text.Json;
 
+namespace clientSignalR;
 public class Program
 {
     public static async Task Main(string[] args)
@@ -47,25 +47,17 @@ public class Program
     }
     private static async Task RunAsync(string url, string path, bool reconnect, int duration, int clients, string comments)
     {
-        var cancellationToken = new CancellationTokenSource();
-        var messageAnalytics = new MessageAnalyticsBase(cancellationToken.Token);
+        var cancellationTokenSource = new CancellationTokenSource();
+        var messageAnalytics = new MessageAnalyticsBase(cancellationTokenSource.Token);
 
-        var init = new Initializer
-        {
-            Reconnect = reconnect,
-            Duration = TimeSpan.FromSeconds(duration),
-            Clients = clients,
-            Comments = comments,
-            WithUrl = url,
-            Path = path
-        };
-        var orchestrator = new ConnectionOrchestrator(init, cancellationToken, messageAnalytics);
+        var init = new Initializer(TimeSpan.FromSeconds(duration), clients, url, comments, path, reconnect);
+        var orchestrator = new ConnectionOrchestrator(init, messageAnalytics);
 
         DisplayImage(init);
-        cancellationToken.CancelAfter(init.Duration);
+        cancellationTokenSource.CancelAfter(init.Duration);
         try
         {
-            await orchestrator.StartAsync();
+            await orchestrator.RunAsync(cancellationTokenSource.Token);
         }
         catch (OperationCanceledException)
         {

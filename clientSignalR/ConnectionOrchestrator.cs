@@ -3,22 +3,24 @@ using sharedCore;
 
 namespace clientSignalR;
 
-public class ConnectionOrchestrator : MonitoredConnectionOrchestratorBase<Initializer>
+public sealed class ConnectionOrchestrator : MonitoredConnectionOrchestratorBase<Initializer>
 {
-    private readonly CancellationToken cancellationToken;
+    private bool reconnect;
 
     public ConnectionOrchestrator(Initializer initializer,
-        CancellationTokenSource cancellationTokenSource,
-        MessageAnalyticsBase messageAnalytics) : base(initializer, "xpto", cancellationTokenSource, messageAnalytics)
+        MessageAnalyticsBase messageAnalytics) : base(initializer, "xpto", messageAnalytics)
     {
-        cancellationToken = cancellationTokenSource.Token;
-        if (initializer.Reconnect)
-        {
-            RegisterReconnectionTask();
-        }
+        reconnect = initializer.Reconnect;
     }
 
-    public override Task RegisterConnectionEvents(int slot, HubConnection connection)
+    public override Task RunAsync(CancellationToken token)
+    {
+        if (reconnect)
+            _ = RegisterReconnectionTask(token);
+        return base.RunAsync(token);
+    }
+
+    public override Task RegisterConnectionEvents(HubConnection connection, CancellationToken token)
     {
         var subscription = connection.On<string>("addFullMessage", (message) =>
         {
@@ -29,7 +31,7 @@ public class ConnectionOrchestrator : MonitoredConnectionOrchestratorBase<Initia
             _messageAnalytics.RegisterMessage(sent, received);
         });
         TaskCompletionSource source = new TaskCompletionSource();
-        cancellationToken.Register(() =>
+        token.Register(() =>
         {
             subscription.Dispose();
             source.SetResult();
@@ -37,17 +39,17 @@ public class ConnectionOrchestrator : MonitoredConnectionOrchestratorBase<Initia
         return source.Task;
     }
 
-    private void RegisterReconnectionTask()
+    private Task RegisterReconnectionTask(CancellationToken token)
     {
-        Task.Run(async () =>
+        return Task.Run(async () =>
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!token.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(10));
                 await CloseAllConnection();
-                await CreateAllConnections();
+                await CreateAllConnections(token);
             }
-        }, cancellationToken: _cancellationToken.Token);
+        }, cancellationToken: token);
     }
 
 

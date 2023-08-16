@@ -1,10 +1,17 @@
 namespace sharedCore;
 
-public class InitializerBase
+public abstract class InitializerBase
 {
-    public TimeSpan Duration { get; init; }
-    public int Clients { get; init; }
-    public string WithUrl { get; init; }
-    public string Comments { get; init; }
+    public InitializerBase(TimeSpan duration, int clients, string withUrl, string comments)
+    {
+        Duration = duration;
+        Clients = clients;
+        WithUrl = withUrl;
+        Comments = comments;
+    }
+    public TimeSpan Duration { get; }
+    public int Clients { get; }
+    public string WithUrl { get; }
+    public string Comments { get; }
 
 }

@@ -15,9 +15,9 @@ public class MessageAnalyticsBase
         Task.Run(async () =>
         {
             _first = _last = DateTime.UtcNow;
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(10));
+                await Task.Delay(TimeSpan.FromSeconds(10), token);
                 await LogAnalytics();
             }
         }, token);
@@ -53,7 +53,7 @@ public class MessageAnalyticsBase
         var result = (localCount / elapsedSecondsFromLast, localCount, TimeSpan.FromTicks(localTicks / localCount));
         Interlocked.Add(ref totalTicks, localTicks);
         Interlocked.Add(ref totalCount, localCount);
- 
+
         _last = DateTime.UtcNow;
         return result;
     }

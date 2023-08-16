@@ -7,9 +7,8 @@ public abstract class MonitoredConnectionOrchestratorBase<TInitializer> : Connec
 
     public MonitoredConnectionOrchestratorBase(TInitializer initializer,
         string group,
-        CancellationTokenSource cancellationToken,
         MessageAnalyticsBase messageAnalytics)
-        : base(initializer, group, cancellationToken)
+        : base(initializer, group)
     {
         _messageAnalytics = messageAnalytics;
     }

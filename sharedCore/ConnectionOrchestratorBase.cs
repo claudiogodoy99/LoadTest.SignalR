@@ -8,34 +8,30 @@ public abstract class ConnectionOrchestratorBase<TInitializer>
     protected readonly HubConnection[] _connections;
     protected readonly TInitializer _initializer;
     private readonly string _group;
-    protected readonly CancellationTokenSource _cancellationToken;
 
     public ConnectionOrchestratorBase(TInitializer initializer,
-        string group,
-        CancellationTokenSource cancellationToken)
+        string group)
     {
         _initializer = initializer;
         _group = group;
         _connections = new HubConnection[initializer.Clients];
-        _cancellationToken = cancellationToken;
-
     }
 
-    public Task StartAsync()
+    public virtual Task RunAsync(CancellationToken token)
     {
-        return CreateAllConnections();
+        return CreateAllConnections(token);
     }
 
-    public abstract Task RegisterConnectionEvents(int slot, HubConnection connection);
+    public abstract Task RegisterConnectionEvents(HubConnection connection, CancellationToken token);
 
-    protected async Task CreateAllConnections()
+    protected async Task CreateAllConnections(CancellationToken token)
     {
         Task[] tasks = new Task[_connections.Length];
         for (int i = 0; i < _connections.Length; i++)
         {
             var connection = CreateConnection(i);
             _connections[i] = connection;
-            tasks[i] = StartConnectionAndRegisterAsync(i, connection);
+            tasks[i] = StartConnectionAndRegisterAsync(connection, token);
         }
         await Task.WhenAll(tasks);
 
@@ -43,10 +39,10 @@ public abstract class ConnectionOrchestratorBase<TInitializer>
         Console.WriteLine("--------------------------------------");
     }
 
-    private async Task StartConnectionAndRegisterAsync(int i, HubConnection connection)
+    private async Task StartConnectionAndRegisterAsync(HubConnection connection, CancellationToken token)
     {
-        await StartConnectionAsync(connection);
-        await RegisterConnectionEvents(i, connection);
+        await StartConnectionAsync(connection, token);
+        await RegisterConnectionEvents(connection, token);
     }
 
     public async Task CloseAllConnection()
@@ -62,8 +58,8 @@ public abstract class ConnectionOrchestratorBase<TInitializer>
           .WithUrl($"{_initializer.WithUrl}?endpoint={_group}&dataId={dataId}")
           .Build();
 
-    private async Task StartConnectionAsync(HubConnection connection)
+    private async Task StartConnectionAsync(HubConnection connection, CancellationToken token)
     {
-        await connection.StartAsync(cancellationToken: _cancellationToken.Token);
+        await connection.StartAsync(cancellationToken: token);
     }
 }
