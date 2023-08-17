@@ -12,8 +12,18 @@ public class CsvWriter
     {
         _messageAnalytics = messageAnalytics;
         _initializer = initializer;
+        EnsurePathExists();
     }
 
+    private void EnsurePathExists()
+    {
+        if (!Directory.Exists(_initializer.Path))
+        {
+            Console.Write($"Path {_initializer.Path} not found, creating directory... ");
+            Directory.CreateDirectory(_initializer.Path);
+            Console.WriteLine("OK!");
+        }
+    }
 
     public async Task RegisterTest()
     {

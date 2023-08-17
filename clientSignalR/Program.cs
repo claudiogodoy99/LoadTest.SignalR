@@ -48,12 +48,13 @@ public class Program
     private static async Task RunAsync(string url, string path, bool reconnect, int duration, int clients, string comments)
     {
         var cancellationTokenSource = new CancellationTokenSource();
-        var messageAnalytics = new MessageAnalyticsBase(cancellationTokenSource.Token);
+        var messageAnalytics = new MessageAnalyticsBase();
 
         var init = new Initializer(TimeSpan.FromSeconds(duration), clients, url, comments, path, reconnect);
+        var csvWriter = new CsvWriter(messageAnalytics, init);
         var orchestrator = new ConnectionOrchestrator(init, messageAnalytics);
-
         DisplayImage(init);
+
         cancellationTokenSource.CancelAfter(init.Duration);
         try
         {
@@ -67,7 +68,6 @@ public class Program
         await orchestrator.CloseAllConnection();
 
         Console.WriteLine("Generating Results File...");
-        var csvWriter = new CsvWriter(messageAnalytics, init);
         await csvWriter.RegisterTest();
         Console.WriteLine("Done!");
     }

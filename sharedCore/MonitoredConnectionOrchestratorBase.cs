@@ -12,4 +12,11 @@ public abstract class MonitoredConnectionOrchestratorBase<TInitializer> : Connec
     {
         _messageAnalytics = messageAnalytics;
     }
+
+    public override Task RunAsync(CancellationToken token)
+    {
+        return Task.WhenAll(
+            _messageAnalytics.RunAsync(token),
+            base.RunAsync(token));
+    }
 }

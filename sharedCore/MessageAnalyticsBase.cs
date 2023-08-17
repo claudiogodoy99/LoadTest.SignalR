@@ -10,9 +10,14 @@ public class MessageAnalyticsBase
     public int totalCount;
     public long totalTicks;
 
-    public MessageAnalyticsBase(CancellationToken token)
+    public MessageAnalyticsBase()
     {
-        Task.Run(async () =>
+
+    }
+
+    public Task RunAsync(CancellationToken token)
+    {
+        return Task.Run(async () =>
         {
             _first = _last = DateTime.UtcNow;
             while (!token.IsCancellationRequested)

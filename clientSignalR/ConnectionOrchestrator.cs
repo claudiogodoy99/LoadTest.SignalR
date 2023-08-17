@@ -24,10 +24,10 @@ public sealed class ConnectionOrchestrator : MonitoredConnectionOrchestratorBase
     {
         var subscription = connection.On<string>("addFullMessage", (message) =>
         {
+            var received = DateTime.UtcNow;
             var s = message.AsSpan();
             long.TryParse(s.Slice(0, s.IndexOf(' ')), out long ticks);
             var sent = new DateTime(ticks);
-            var received = DateTime.UtcNow;
             _messageAnalytics.RegisterMessage(sent, received);
         });
         TaskCompletionSource source = new TaskCompletionSource();
