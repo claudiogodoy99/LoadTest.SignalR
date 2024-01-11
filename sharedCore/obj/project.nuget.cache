@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "0vUMfYSR/xAQsvAw55fHBb8rpMLRi9j2bx4Lpx8O1gz3n3FJ2RlU1jLcwlpNqjrDf5Orv77o+D/AVda5aECkvw==",
+  "dgSpecHash": "eutdEARaD1z++UoWrkmukPxcxnVJjXi5+PhyCaTos4cVcDZngEQTA2VE1FeHJNrB0qaQ8WNcVk5tF1MKax2M6A==",
   "success": true,
   "projectFilePath": "C:\\repos\\LoadTest.SignalR\\sharedCore\\sharedCore.csproj",
   "expectedPackageFiles": [

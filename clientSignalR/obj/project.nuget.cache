@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "uDuJy8RgvjzejhetBXgHHxAIQzv9BoNnLqEyLsjVjUbUr0VWuDjzJ72H3unypiHFeIX6wzBKfFV1ABwQezWzpQ==",
+  "dgSpecHash": "fsg75G6h/uvXmcZguP9IfqPdCIVzSN4IfPcUcR5ynJWC8iRbsl+gYpNvnCQdVgjJ3JRbz0nVdMgXUEV27k21hg==",
   "success": true,
   "projectFilePath": "C:\\repos\\LoadTest.SignalR\\clientSignalR\\clientSignalR.csproj",
   "expectedPackageFiles": [

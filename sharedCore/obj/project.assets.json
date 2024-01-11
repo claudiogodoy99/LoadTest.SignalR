@@ -721,11 +721,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\repos\\LoadTest.SignalR\\sharedCore\\sharedCore.csproj",
+      "projectUniqueName": "C:\\repos\\LoadTest.SignalR\\sharedCore\\sharedCore.csproj",
       "projectName": "sharedCore",
-      "projectPath": "c:\\repos\\LoadTest.SignalR\\sharedCore\\sharedCore.csproj",
+      "projectPath": "C:\\repos\\LoadTest.SignalR\\sharedCore\\sharedCore.csproj",
       "packagesPath": "C:\\Users\\claudiogodoy\\.nuget\\packages\\",
-      "outputPath": "c:\\repos\\LoadTest.SignalR\\sharedCore\\obj\\",
+      "outputPath": "C:\\repos\\LoadTest.SignalR\\sharedCore\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -782,7 +782,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101\\RuntimeIdentifierGraph.json"
       }
     }
   }
