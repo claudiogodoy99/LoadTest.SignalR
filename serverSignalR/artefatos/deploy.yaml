@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: server-signalr
+  name: server-signalr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server-signalr
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: server-signalr
+    spec:
+      containers:
+        - image: registrygodoy.azurecr.io/signalrserver:v1
+          name: server-signalr
+          ports:
+            - containerPort: 80
+          resources: {}

@@ -3,6 +3,9 @@
     "clientProducerSignalR": {
       "commandName": "Project",
       "commandLineArgs": "\"http://localhost:5062/notificationhub\" --duration 100 --mps 10000 --consumerClients 250 --messageSize 200 --comment \"Teste de carga\""
+    },
+    "Docker": {
+      "commandName": "Docker"
     }
   }
 }

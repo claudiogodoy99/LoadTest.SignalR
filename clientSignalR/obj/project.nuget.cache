@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "fsg75G6h/uvXmcZguP9IfqPdCIVzSN4IfPcUcR5ynJWC8iRbsl+gYpNvnCQdVgjJ3JRbz0nVdMgXUEV27k21hg==",
+  "dgSpecHash": "EiwP5WgehEfyqycx1Q1y9QDlQTAiZZU1Q9HX1Nyi3AyRJyrAd97BVlMnoQaOo9C7QWHwOP0bks88pMSayT6pzw==",
   "success": true,
   "projectFilePath": "C:\\repos\\LoadTest.SignalR\\clientSignalR\\clientSignalR.csproj",
   "expectedPackageFiles": [
@@ -18,6 +18,7 @@
     "C:\\Users\\claudiogodoy\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\7.0.1\\microsoft.extensions.logging.abstractions.7.0.1.nupkg.sha512",
     "C:\\Users\\claudiogodoy\\.nuget\\packages\\microsoft.extensions.options\\7.0.1\\microsoft.extensions.options.7.0.1.nupkg.sha512",
     "C:\\Users\\claudiogodoy\\.nuget\\packages\\microsoft.extensions.primitives\\7.0.0\\microsoft.extensions.primitives.7.0.0.nupkg.sha512",
+    "C:\\Users\\claudiogodoy\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.5\\microsoft.visualstudio.azure.containers.tools.targets.1.19.5.nupkg.sha512",
     "C:\\Users\\claudiogodoy\\.nuget\\packages\\system.commandline\\2.0.0-beta4.22272.1\\system.commandline.2.0.0-beta4.22272.1.nupkg.sha512",
     "C:\\Users\\claudiogodoy\\.nuget\\packages\\system.io.pipelines\\7.0.0\\system.io.pipelines.7.0.0.nupkg.sha512",
     "C:\\Users\\claudiogodoy\\.nuget\\packages\\system.threading.channels\\7.0.0\\system.threading.channels.7.0.0.nupkg.sha512"
