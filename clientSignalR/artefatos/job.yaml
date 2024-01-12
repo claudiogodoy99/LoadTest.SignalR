@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: client
+spec:
+  parallelism: 4
+  template:
+    spec:
+      containers:
+        - name: client
+          image: registrygodoy.azurecr.io/client-job:v1
+          command:
+            [
+              "dotnet",
+              "./clientSignalR.dll",
+              "--url",
+              "http://10.0.85.55:5678/notificationhub",
+              "--clients",
+              "5",
+              "--duration",
+              "600",
+              "--messageSize",
+              "1024",
+              "--reconnect",
+              "--path",
+              ".",
+            ]
+      restartPolicy: Never
+  backoffLimit: 4

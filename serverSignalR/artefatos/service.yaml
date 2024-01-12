@@ -14,5 +14,3 @@ spec:
   selector:
     app: server-signalr
   type: ClusterIP
-status:
-  loadBalancer: {}

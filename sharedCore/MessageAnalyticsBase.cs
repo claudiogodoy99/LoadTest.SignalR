@@ -53,7 +53,7 @@ public class MessageAnalyticsBase
         var result = (localCount / elapsedSecondsFromLast, localCount, TimeSpan.FromTicks(localTicks / localCount));
         Interlocked.Add(ref totalTicks, localTicks);
         Interlocked.Add(ref totalCount, localCount);
- 
+
         _last = DateTime.UtcNow;
         return result;
     }

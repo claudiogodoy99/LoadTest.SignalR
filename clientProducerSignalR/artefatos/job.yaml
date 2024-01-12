@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: producer
+spec:
+  template:
+    spec:
+      containers:
+        - name: producer
+          image: registrygodoy.azurecr.io/producer-job:v1
+          command:
+            [
+              "dotnet",
+              "./clientProducerSignalR.dll",
+              "--url",
+              "http://10.0.85.55:5678/notificationhub",
+              "--clients",
+              "5",
+              "--consumerClients",
+              "20",
+              "--duration",
+              "600",
+              "--mps",
+              "50",
+              "--messageSize",
+              "1024",
+              "--comment",
+              " Teste de carga",
+            ]
+      restartPolicy: Never
+  backoffLimit: 4
